@@ -158,6 +158,58 @@ export const sendOtp = asyncHandler(async (req, res) => {
   }
 });
 
+// export const verifyOtp = asyncHandler(async (req, res) => {
+//   const email = (req.body.email || "").trim().toLowerCase();
+//   const otp = (req.body.otp || "").trim();
+
+//   if (!email || !otp) {
+//     res.status(400);
+//     throw new Error("Missing credentials.");
+//   }
+
+//   const user = await User.findOne({ email }).select("+otp +otpExpires");
+
+//   if (!user) {
+//     res.status(400);
+//     throw new Error("Invalid email or OTP.");
+//   }
+
+//   if (!user.otpExpires || user.otpExpires < Date.now()) {
+//     res.status(400);
+//     throw new Error("OTP has expired. Please request a new one.");
+//   }
+
+//   // compare plain otp with hashed otp
+//   const isMatch = await bcrypt.compare(otp, user.otp);
+
+//   if (!isMatch) {
+//     res.status(400);
+//     throw new Error("Invalid otp.");
+//   }
+
+//   // clear otp
+//   user.otp = undefined;
+//   user.otpExpires = undefined;
+//   await user.save({ validateBeforeSave: false });
+
+//   const token = generateToken(user._id, res);
+
+//   return res.status(200).json({
+//     success: true,
+//     message: "OTP verified successfully!",
+//     token,
+//     user: {
+//       _id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       mobile: user.mobile,
+//       accountType: user.accountType,
+//       role: user.role,
+//     },
+//   });
+// });
+
+
 export const verifyOtp = asyncHandler(async (req, res) => {
   const email = (req.body.email || "").trim().toLowerCase();
   const otp = (req.body.otp || "").trim();
@@ -176,27 +228,25 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 
   if (!user.otpExpires || user.otpExpires < Date.now()) {
     res.status(400);
-    throw new Error("OTP has expired. Please request a new one.");
+    throw new Error("OTP expired");
   }
 
-  // compare plain otp with hashed otp
   const isMatch = await bcrypt.compare(otp, user.otp);
-
   if (!isMatch) {
     res.status(400);
-    throw new Error("Invalid otp.");
+    throw new Error("Invalid OTP");
   }
 
-  // clear otp
   user.otp = undefined;
   user.otpExpires = undefined;
   await user.save({ validateBeforeSave: false });
 
-  const token = generateToken(user._id, res);
+  // ⭐ TOKEN ONLY (NO COOKIE)
+  const token = generateToken(user._id);
 
-  return res.status(200).json({
+  res.status(200).json({
     success: true,
-    message: "OTP verified successfully!",
+    message: "OTP verified",
     token,
     user: {
       _id: user._id,
@@ -209,6 +259,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
   });
 });
 
+
 export const getMe = asyncHandler(async (req, res) => {
   const user = req.user;
   res.status(200).json({
@@ -218,12 +269,21 @@ export const getMe = asyncHandler(async (req, res) => {
   });
 });
 
+// export const logout = asyncHandler(async (req, res) => {
+//   const name = getAuthCookieName();
+//   const opts = getAuthCookieOptions();
+
+//   res.clearCookie(name, opts);
+
+//   return res.status(200).json({
+//     success: true,
+//     message: "Logged out successfully",
+//   });
+// });
+
+
+
 export const logout = asyncHandler(async (req, res) => {
-  const name = getAuthCookieName();
-  const opts = getAuthCookieOptions();
-
-  res.clearCookie(name, opts);
-
   return res.status(200).json({
     success: true,
     message: "Logged out successfully",

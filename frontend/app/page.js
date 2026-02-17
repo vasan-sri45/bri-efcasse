@@ -14,9 +14,10 @@ export default function LoginPage() {
   const toggle = () => setIsLogin((v) => !v);
 
   useEffect(() => {
-    if (!hydrated) return;
-    if (user) router.replace("/serviced");
-  }, [hydrated, user, router]);
+  if (!hydrated) return;
+  if (user) router.replace("/serviced");
+}, [user, hydrated]);
+
 
   if (!hydrated || user) return null;
 

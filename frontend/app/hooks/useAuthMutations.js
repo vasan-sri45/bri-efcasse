@@ -35,6 +35,28 @@ export const useSendOtp = () => {
 /* =====================================================
    VERIFY OTP + LOGIN
 ===================================================== */
+// export const useVerifyOtp = () => {
+//   const dispatch = useDispatch();
+//   const router = useRouter();
+
+//   return useMutation({
+//     mutationFn: async ({ email, otp }) => {
+//       const res = await api.post("/verify-otp", { email, otp });
+//       return res.data; // { success, user }
+//     },
+
+//     onSuccess: (data) => {
+//       if (!data?.user) return;
+
+//       // Save user in Redux + localStorage
+//       dispatch(setUser(data.user));
+
+//       // Redirect to app
+//       router.replace("/serviced");
+//     },
+//   });
+// };
+
 export const useVerifyOtp = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -42,20 +64,18 @@ export const useVerifyOtp = () => {
   return useMutation({
     mutationFn: async ({ email, otp }) => {
       const res = await api.post("/verify-otp", { email, otp });
-      return res.data; // { success, user }
+      return res.data;
     },
 
     onSuccess: (data) => {
-      if (!data?.user) return;
+      if (!data?.token) return;
 
-      // Save user in Redux + localStorage
-      dispatch(setUser(data.user));
-
-      // Redirect to app
+      dispatch(setAuth({ user: data.user, token: data.token }));
       router.replace("/serviced");
     },
   });
 };
+
 
 // alias
 export const useOtpLogin = useVerifyOtp;
@@ -63,28 +83,47 @@ export const useOtpLogin = useVerifyOtp;
 /* =====================================================
    LOGOUT
 ===================================================== */
+// export const useLogout = () => {
+//   const dispatch = useDispatch();
+//   const router = useRouter();
+//   const queryClient = useQueryClient();
+
+//   return useMutation({
+//     mutationFn: async () => {
+//       await api.post("/logout");
+//     },
+
+//     onSuccess: () => {
+//       // Clear react-query cache
+//       queryClient.clear();
+
+//       // Clear redux + localStorage
+//       dispatch(clearUser());
+
+//       // Go to login
+//       router.replace("/");
+//     },
+//   });
+// };
+
+
 export const useLogout = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
-      await api.post("/logout");
-    },
+    mutationFn: async () => Promise.resolve(),
 
     onSuccess: () => {
-      // Clear react-query cache
       queryClient.clear();
-
-      // Clear redux + localStorage
-      dispatch(clearUser());
-
-      // Go to login
+      dispatch(clearAuth());
       router.replace("/");
     },
   });
 };
+
+
 
 /* =====================================================
    GET CURRENT USER (SESSION RESTORE)

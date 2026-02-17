@@ -4,21 +4,18 @@ import { useSelector } from "react-redux";
 import Navbar from "../navbar/Navbar";
 import Footer from "../navbar/Footer";
 
-
 export default function AppLayout({ children }) {
   const { user, hydrated } = useSelector((s) => s.auth);
 
-  const isAuthPage = user != "null";
- 
-
-  // wait for hydration to avoid flicker
   if (!hydrated) return null;
+
+  const isLoggedIn = !!user;
 
   return (
     <>
-      {isAuthPage && user && <Navbar />}
+      {isLoggedIn && <Navbar />}
       {children}
-      {isAuthPage && user && <Footer />}
+      {isLoggedIn && <Footer />}
     </>
   );
 }

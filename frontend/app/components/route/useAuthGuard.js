@@ -2,27 +2,25 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { useMe } from "../../hooks/useAuthMutations";
+import { useSelector } from "react-redux";
 
 export function useAuthGuard() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data, isLoading, isError } = useMe();
+  const { user, hydrated } = useSelector((s) => s.auth);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (!hydrated) return;
 
-    // ❌ Not logged in → go to login page
-    if (isError || !data?.user) {
-      if (pathname !== "/") {
-        router.replace("/serviced");
-      }
+    // not logged in
+    if (!user) {
+      if (pathname !== "/") router.replace("/");
     }
-  }, [isLoading, isError, data, pathname, router]);
 
-  return {
-    loading: isLoading,
-    user: data?.user ?? null,
-    isAuthenticated: !!data?.user,
-  };
+    // logged in but in login page
+    if (user && pathname === "/") {
+      router.replace("/serviced");
+    }
+
+  }, [user, hydrated, pathname, router]);
 }
