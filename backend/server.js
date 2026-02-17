@@ -18,7 +18,7 @@ import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
-const allowlist = ["http://localhost:3000"];
+const allowlist = ["https://bri-efcasse-3.onrender.com"];
 const corsOptions = {
   origin(origin, cb) {
     if (!origin || allowlist.includes(origin)) return cb(null, true);
