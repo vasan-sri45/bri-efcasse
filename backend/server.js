@@ -62,7 +62,6 @@
 //   connectDB();
 // });
 
-
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -86,8 +85,7 @@ import { notFound, errorHandler } from "./middleware/errorHandler.js";
 const app = express();
 
 /* =====================================================
-   1️⃣ TRUST PROXY (RENDER / HEROKU / RAILWAY REQUIRED)
-   Without this secure cookies never work
+   1️⃣ TRUST PROXY (REQUIRED FOR RENDER HTTPS COOKIES)
 ===================================================== */
 app.set("trust proxy", 1);
 
@@ -112,7 +110,7 @@ const corsOptions = {
 
 /* APPLY CORS BEFORE ROUTES */
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // preflight for all routes
+app.options("/{*any}", cors(corsOptions)); // ✅ Express v5 compatible preflight
 
 /* =====================================================
    3️⃣ MIDDLEWARES
@@ -140,9 +138,9 @@ app.use("/api", BlogRoutes);
 app.use("/api/paid", PaidServiceRoutes);
 
 /* =====================================================
-   5️⃣ ERROR HANDLERS
+   5️⃣ ERROR HANDLING (EXPRESS v5 SYNTAX)
 ===================================================== */
-app.all("/api/*", notFound);
+app.all("/api/{*any}", notFound); // ✅ replaces /api/*
 app.use(errorHandler);
 
 /* =====================================================
@@ -151,7 +149,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 4500;
 
 app.listen(PORT, async () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
   console.log("RESEND_API_KEY loaded?", !!process.env.RESEND_API_KEY);
   await connectDB();
 });
