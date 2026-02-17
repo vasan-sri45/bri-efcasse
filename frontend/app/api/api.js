@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:4500/api",
+  baseURL: "https://bri-efcasse-2.onrender.com/api",
   withCredentials: true, // cookie auth only
   timeout: 60000,
 });
